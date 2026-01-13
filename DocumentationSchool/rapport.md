@@ -2,10 +2,24 @@
 
 ## Comment on run?
 
+Depuis ./src/main/docker
 ```shell
-docker compose -f services.yml up -d postgresql
+docker compose -f services.yml up -d
+```
+
+Depuis ./
+```
+npm install
 ./mvnw
 ```
+
+Dans adminer :
+server: postgresql
+username: graphapp
+password: admin
+db: graphapp
+
+System: Postgresql
 
 ## Prompts
 ![img.png](media/img.png)
