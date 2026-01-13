@@ -1,7 +1,15 @@
-# This configuration is intended for development purpose, it's **your** responsibility to harden it for production
 name: graphapp
 services:
   postgresql:
     extends:
       file: ./postgresql.yml
       service: postgresql
+
+  adminer:
+    image: adminer:latest
+    container_name: graphapp-adminer
+    restart: unless-stopped
+    ports:
+      - '8081:8080'
+    depends_on:
+      - postgresql

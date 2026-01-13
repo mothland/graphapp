@@ -1,0 +1,32 @@
+entity Graph {
+  name String required
+  description String
+  createdAt Instant
+}
+
+entity Node {
+  label String required
+  x Float required
+  y Float required
+}
+
+entity Edge {
+  weight Float required
+  directed Boolean required
+}
+
+entity Comment {
+  content TextBlob required
+  createdAt Instant
+}
+
+relationship OneToMany {
+  Graph{nodes} to Node{graph}
+  Graph{edges} to Edge{graph}
+  Graph{comments} to Comment{graph}
+}
+
+relationship ManyToOne {
+  Edge{source} to Node
+  Edge{target} to Node
+}

@@ -1,0 +1,34 @@
+{
+  "annotations": {
+    "changelogDate": "20260113144323"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "label",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "x",
+      "fieldType": "Float",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "y",
+      "fieldType": "Float",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Node",
+  "relationships": [
+    {
+      "otherEntityName": "graph",
+      "otherEntityRelationshipName": "nodes",
+      "relationshipName": "graph",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

@@ -1,0 +1,41 @@
+{
+  "annotations": {
+    "changelogDate": "20260113144324"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "weight",
+      "fieldType": "Float",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "directed",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Edge",
+  "relationships": [
+    {
+      "otherEntityName": "node",
+      "relationshipName": "source",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "node",
+      "relationshipName": "target",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "graph",
+      "otherEntityRelationshipName": "edges",
+      "relationshipName": "graph",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}
