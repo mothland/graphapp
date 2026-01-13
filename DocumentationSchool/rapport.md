@@ -12,6 +12,10 @@ Depuis ./
 npm install
 ./mvnw
 ```
+Sur linux (et, on espère, MacOS), prioriser :
+```
+chmod +x ./mvnw
+```
 
 Dans adminer :
 server: postgresql
