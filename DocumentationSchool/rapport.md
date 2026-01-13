@@ -7,6 +7,7 @@ docker compose -f services.yml up -d postgresql
 ./mvnw
 ```
 
+## Prompts
 ![img.png](media/img.png)
 
 > Provided the final contents for the `postgresql.yml` file
