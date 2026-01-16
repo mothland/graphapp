@@ -2,11 +2,13 @@ package com.graphapp.web.rest;
 
 import com.graphapp.domain.Graph;
 import com.graphapp.repository.GraphRepository;
+import com.graphapp.service.dto.FullGraphDTO;
 import com.graphapp.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -178,5 +180,53 @@ public class GraphResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @GetMapping("/{id}/full")
+    @Transactional(readOnly = true)
+    public ResponseEntity<FullGraphDTO> getFullGraph(@PathVariable Long id) {
+        LOG.debug("REST request to get FULL Graph aggregate by id : {}", id);
+
+        return graphRepository
+            .findById(id)
+            .map(graph -> {
+                // ---- Graph DTO
+                FullGraphDTO.GraphDTO graphDTO = new FullGraphDTO.GraphDTO();
+                graphDTO.id = graph.getId();
+                graphDTO.name = graph.getName();
+                graphDTO.description = graph.getDescription();
+
+                // ---- Nodes DTOs
+                var nodeDTOs = graph
+                    .getNodes()
+                    .stream()
+                    .map(n -> {
+                        FullGraphDTO.NodeDTO dto = new FullGraphDTO.NodeDTO();
+                        dto.id = n.getId();
+                        dto.label = n.getLabel();
+                        dto.x = n.getX();
+                        dto.y = n.getY();
+                        return dto;
+                    })
+                    .toList();
+
+                // ---- Edges DTOs
+                var edgeDTOs = graph
+                    .getEdges()
+                    .stream()
+                    .map(e -> {
+                        FullGraphDTO.EdgeDTO dto = new FullGraphDTO.EdgeDTO();
+                        dto.id = e.getId();
+                        dto.source = e.getSource().getId();
+                        dto.target = e.getTarget().getId();
+                        dto.weight = e.getWeight();
+                        dto.directed = e.getDirected();
+                        return dto;
+                    })
+                    .toList();
+
+                return ResponseEntity.ok(new FullGraphDTO(graphDTO, nodeDTOs, edgeDTOs));
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 }

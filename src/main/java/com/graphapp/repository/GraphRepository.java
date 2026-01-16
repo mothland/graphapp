@@ -1,6 +1,7 @@
 package com.graphapp.repository;
 
 import com.graphapp.domain.Graph;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface GraphRepository extends JpaRepository<Graph, Long> {}
+public interface GraphRepository extends JpaRepository<Graph, Long> {
+    Optional<Graph> findOneByName(String name);
+}
