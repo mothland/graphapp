@@ -314,3 +314,161 @@ http://stackoverflow.com/questions/23436430/bootstrap-3-input-group-100-width */
 }
 
 /* jhipster-needle-scss-add-main JHipster will add new css style */
+
+.graph-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.graph-builder__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.graph-builder__title {
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.graph-builder__subtitle {
+  margin: 0.25rem 0 0;
+  color: #475569;
+}
+
+.graph-builder__header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.graph-builder__alert {
+  margin-bottom: 0;
+}
+
+.graph-builder__layout {
+  --builder-panel-gap: 1.25rem;
+  gap: var(--builder-panel-gap);
+}
+
+.graph-builder__canvas-card {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.graph-builder__canvas-header {
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.graph-builder__canvas-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.graph-builder__badge-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.graph-builder__hint {
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.graph-builder__canvas {
+  width: 100%;
+  overflow: hidden;
+}
+
+.graph-builder__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  border-radius: 12px;
+  cursor: crosshair;
+}
+
+.graph-builder__nodes .graph-builder__node circle {
+  fill: #4f46e5;
+  stroke: #1e1b4b;
+  stroke-width: 2;
+}
+
+.graph-builder__nodes .graph-builder__node text {
+  font-size: 12px;
+  fill: #fff;
+  pointer-events: none;
+}
+
+.graph-builder__nodes .graph-builder__node.is-selected circle {
+  fill: #f97316;
+}
+
+.graph-builder__panel {
+  border-radius: 16px;
+}
+
+.graph-builder__panel-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.graph-builder__muted {
+  color: #6b7280;
+  margin: 0;
+}
+
+.graph-builder__edge-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.graph-builder__edge-row {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: #f8fafc;
+}
+
+.graph-builder__edge-label {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.graph-builder__edge-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.graph-builder__edge-controls input[type='number'] {
+  max-width: 80px;
+}
+
+.graph-builder__edge-delete {
+  padding: 0;
+  color: #ef4444;
+}
+
+.graph-builder__edge-checkbox {
+  margin: 0;
+}
+
+.graph-builder__checkbox {
+  margin-top: 0.75rem;
+}

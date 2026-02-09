@@ -71,6 +71,10 @@ export const Graph = () => {
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
             <FontAwesomeIcon icon="sync" spin={loading} /> Refresh list
           </Button>
+          <Link to="/graph/builder" className="btn btn-outline-primary me-2">
+            <FontAwesomeIcon icon="tasks" />
+            &nbsp; Visual builder
+          </Link>
           <Link to="/graph/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
             &nbsp; Create a new Graph
