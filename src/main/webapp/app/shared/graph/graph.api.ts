@@ -9,9 +9,24 @@ export async function createGraph(payload: { name: string; description?: string 
   return res.data as { id: number };
 }
 
+export async function updateGraph(payload: { id: number; name: string; description?: string | null }) {
+  const res = await axios.put(`/api/graphs/${payload.id}`, payload);
+  return res.data as { id: number };
+}
+
 export async function createNode(payload: { label: string; x: number; y: number; graph: { id: number } }) {
   const res = await axios.post('/api/nodes', payload);
   return res.data as { id: number };
+}
+
+export async function updateNode(payload: { id: number; label: string; x: number; y: number; graph: { id: number } }) {
+  const res = await axios.put(`/api/nodes/${payload.id}`, payload);
+  return res.data as { id: number };
+}
+
+export async function deleteNode(id: number) {
+  const res = await axios.delete(`/api/nodes/${id}`);
+  return res.data;
 }
 
 export async function createEdge(payload: {
@@ -22,6 +37,23 @@ export async function createEdge(payload: {
   target: { id: number };
 }) {
   const res = await axios.post('/api/edges', payload);
+  return res.data;
+}
+
+export async function updateEdge(payload: {
+  id: number;
+  weight: number;
+  directed: boolean;
+  graph: { id: number };
+  source: { id: number };
+  target: { id: number };
+}) {
+  const res = await axios.put(`/api/edges/${payload.id}`, payload);
+  return res.data;
+}
+
+export async function deleteEdge(id: number) {
+  const res = await axios.delete(`/api/edges/${id}`);
   return res.data;
 }
 

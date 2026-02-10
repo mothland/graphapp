@@ -20,11 +20,35 @@ const PAGE_SIZE = 4;
 const PREVIEW_WIDTH = 360;
 const PREVIEW_HEIGHT = 220;
 
+/* ---------------------------------- */
+/* ViewBox helper                     */
+/* ---------------------------------- */
+function computeViewBox(graph: GraphData, padding = 40): string {
+  if (graph.nodes.length === 0) {
+    return `0 0 ${PREVIEW_WIDTH} ${PREVIEW_HEIGHT}`;
+  }
+
+  const xs = graph.nodes.map(n => n.x);
+  const ys = graph.nodes.map(n => n.y);
+
+  const minX = Math.min(...xs) - padding;
+  const maxX = Math.max(...xs) + padding;
+  const minY = Math.min(...ys) - padding;
+  const maxY = Math.max(...ys) + padding;
+
+  return `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+}
+
+/* ---------------------------------- */
+/* Graph preview                      */
+/* ---------------------------------- */
 const GraphPreview = ({ graphId }: { graphId: number }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [graphData, setGraphData] = useState<GraphData | null>(null);
+  const [viewBox, setViewBox] = useState<string>();
 
   useEffect(() => {
     let isActive = true;
@@ -37,21 +61,18 @@ const GraphPreview = ({ graphId }: { graphId: number }) => {
         const full = await getFullGraphById(graphId);
         if (!isActive) return;
 
-        setGraphData(mapToGraphData(full));
+        const data = mapToGraphData(full);
+        setGraphData(data);
+        setViewBox(computeViewBox(data));
       } catch (err: any) {
         if (!isActive) return;
         setErrorMessage(err?.message ?? 'Failed to load graph.');
       } finally {
-        if (isActive) {
-          setLoading(false);
-        }
+        if (isActive) setLoading(false);
       }
     };
 
-    if (graphId) {
-      loadGraph();
-    }
-
+    if (graphId) loadGraph();
     return () => {
       isActive = false;
     };
@@ -69,22 +90,29 @@ const GraphPreview = ({ graphId }: { graphId: number }) => {
           <Spinner size="sm" /> Loading preview...
         </div>
       )}
+
       {errorMessage && (
         <Alert color="danger" className="mb-0">
           {errorMessage}
         </Alert>
       )}
+
       {!loading && !errorMessage && !graphData && (
         <Alert color="warning" className="mb-0">
           No graph data.
         </Alert>
       )}
-      {!loading && !errorMessage && graphData && <svg ref={svgRef} width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} />}
+
+      {!loading && !errorMessage && graphData && (
+        <svg ref={svgRef} width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} viewBox={viewBox} preserveAspectRatio="xMidYMid meet" />
+      )}
     </div>
   );
 };
 
-// Placeholder pour le composant GraphRenderer (fait par ton collègue)
+/* ---------------------------------- */
+/* Graph grid                         */
+/* ---------------------------------- */
 const GraphRendererGrid = ({ graphs }: { graphs: GraphDTO[] }) => (
   <Row className="g-3">
     {graphs.map(g => (
@@ -98,7 +126,7 @@ const GraphRendererGrid = ({ graphs }: { graphs: GraphDTO[] }) => (
                   Visualize
                 </Button>
               </Link>
-              <Link to={`/editor/${g.id}`}>
+              <Link to={`/graph/builder/${g.id}`}>
                 <Button size="sm" color="secondary">
                   Edit
                 </Button>
@@ -107,7 +135,7 @@ const GraphRendererGrid = ({ graphs }: { graphs: GraphDTO[] }) => (
           </CardHeader>
           <CardBody>
             <GraphPreview graphId={g.id} />
-            {g.description ? <div className="text-muted mt-2">{g.description}</div> : null}
+            {g.description && <div className="text-muted mt-2">{g.description}</div>}
           </CardBody>
         </Card>
       </Col>
@@ -115,6 +143,9 @@ const GraphRendererGrid = ({ graphs }: { graphs: GraphDTO[] }) => (
   </Row>
 );
 
+/* ---------------------------------- */
+/* Sidebar algorithms                 */
+/* ---------------------------------- */
 const ALGORITHMS = [
   { name: 'BFS (Breadth-First Search)', url: 'https://en.wikipedia.org/wiki/Breadth-first_search' },
   { name: 'DFS (Depth-First Search)', url: 'https://en.wikipedia.org/wiki/Depth-first_search' },
@@ -123,6 +154,9 @@ const ALGORITHMS = [
   { name: 'Prim', url: 'https://en.wikipedia.org/wiki/Prim%27s_algorithm' },
 ];
 
+/* ---------------------------------- */
+/* Home page                          */
+/* ---------------------------------- */
 export const Home = () => {
   const [graphs, setGraphs] = useState<GraphDTO[]>([]);
   const [loading, setLoading] = useState(false);
@@ -165,7 +199,13 @@ export const Home = () => {
             <Button
               size="sm"
               color="success"
-              onClick={() => window.open('https://github.com/<TON_ORG>/<TON_REPO>', '_blank', 'noopener,noreferrer')}
+              onClick={() =>
+                window.open(
+                  'https://github.com/mothland/graphapp/tree/main/src/main/webapp/app/shared/graph/algos',
+                  '_blank',
+                  'noopener,noreferrer',
+                )
+              }
             >
               Contribuer
             </Button>
@@ -226,9 +266,17 @@ export const Home = () => {
   );
 };
 
+/* ---------------------------------- */
+/* DTO → GraphData                    */
+/* ---------------------------------- */
 function mapToGraphData(full: FullGraphDTO): GraphData {
   return {
-    nodes: full.nodes.map(n => ({ id: n.id, label: n.label, x: n.x, y: n.y })),
+    nodes: full.nodes.map(n => ({
+      id: n.id,
+      label: n.label,
+      x: n.x,
+      y: n.y,
+    })),
     edges: full.edges.map(e => ({
       id: e.id,
       source: e.source,

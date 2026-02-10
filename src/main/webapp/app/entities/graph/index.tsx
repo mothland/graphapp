@@ -13,6 +13,7 @@ const GraphRoutes = () => (
   <ErrorBoundaryRoutes>
     <Route index element={<Graph />} />
     <Route path="builder" element={<GraphBuilder />} />
+    <Route path="builder/:id" element={<GraphBuilder />} />
     <Route path="new" element={<GraphUpdate />} />
     <Route path=":id">
       <Route index element={<GraphDetail />} />

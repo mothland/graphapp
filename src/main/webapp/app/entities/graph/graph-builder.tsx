@@ -1,9 +1,19 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Alert, Badge, Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Label, Row } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { createFullGraphFrontend } from 'app/shared/graph/graph.api';
+import {
+  createEdge,
+  createFullGraphFrontend,
+  createNode,
+  deleteEdge,
+  deleteNode,
+  getFullGraphById,
+  updateEdge,
+  updateGraph,
+  updateNode,
+} from 'app/shared/graph/graph.api';
 
 interface BuilderNode {
   id: number;
@@ -24,8 +34,13 @@ const DEFAULT_CANVAS_HEIGHT = 520;
 
 export const GraphBuilder = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const graphId = id ? Number(id) : null;
+  const isEditMode = Number.isFinite(graphId);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const originalNodesRef = useRef<BuilderNode[]>([]);
+  const originalEdgesRef = useRef<BuilderEdge[]>([]);
 
   const [graphName, setGraphName] = useState('');
   const [graphDescription, setGraphDescription] = useState('');
@@ -42,6 +57,7 @@ export const GraphBuilder = () => {
   const [canvasWidth, setCanvasWidth] = useState(900);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [loadingGraph, setLoadingGraph] = useState(false);
 
   const nextNodeId = useMemo(() => (nodes.length === 0 ? 1 : Math.max(...nodes.map(n => n.id)) + 1), [nodes]);
   const nextEdgeId = useMemo(() => (edges.length === 0 ? 1 : Math.max(...edges.map(e => e.id)) + 1), [edges]);
@@ -56,6 +72,45 @@ export const GraphBuilder = () => {
     window.addEventListener('resize', updateSize);
     return () => window.removeEventListener('resize', updateSize);
   }, []);
+
+  useEffect(() => {
+    if (!isEditMode || graphId == null) return;
+    let isActive = true;
+    const loadGraph = async () => {
+      setLoadingGraph(true);
+      setErrorMessage(null);
+      try {
+        const full = await getFullGraphById(graphId);
+        if (!isActive) return;
+        setGraphName(full.graph.name ?? '');
+        setGraphDescription(full.graph.description ?? '');
+        const loadedNodes = full.nodes.map(n => ({ id: n.id, label: n.label, x: n.x, y: n.y }));
+        const loadedEdges = full.edges.map(e => ({
+          id: e.id,
+          source: e.source,
+          target: e.target,
+          weight: e.weight,
+          directed: e.directed,
+        }));
+        originalNodesRef.current = loadedNodes;
+        originalEdgesRef.current = loadedEdges;
+        setNodes(loadedNodes);
+        setEdges(loadedEdges);
+        setSelectedNodeId(null);
+        setConnectFromId(null);
+        setConnectMode(false);
+      } catch (err: any) {
+        if (!isActive) return;
+        setErrorMessage(err?.message ?? 'Failed to load graph.');
+      } finally {
+        if (isActive) setLoadingGraph(false);
+      }
+    };
+    loadGraph();
+    return () => {
+      isActive = false;
+    };
+  }, [graphId, isEditMode]);
 
   const getSvgPoint = (event: React.MouseEvent) => {
     const svg = svgRef.current;
@@ -171,21 +226,108 @@ export const GraphBuilder = () => {
     setErrorMessage(null);
     setSaving(true);
     try {
-      const nodeIndex = new Map(nodes.map((n, idx) => [n.id, idx]));
-      const graphId = await createFullGraphFrontend({
-        name: graphName.trim(),
-        description: graphDescription.trim() || undefined,
-        nodes: nodes.map(n => ({ label: n.label, x: n.x, y: n.y })),
-        edges: edges.map(e => ({
-          sourceIndex: nodeIndex.get(e.source) ?? 0,
-          targetIndex: nodeIndex.get(e.target) ?? 0,
-          weight: e.weight,
-          directed: e.directed,
-        })),
+      if (!isEditMode || graphId == null) {
+        const nodeIndex = new Map(nodes.map((n, idx) => [n.id, idx]));
+        const createdGraphId = await createFullGraphFrontend({
+          name: graphName.trim(),
+          description: graphDescription.trim() || undefined,
+          nodes: nodes.map(n => ({ label: n.label, x: n.x, y: n.y })),
+          edges: edges.map(e => ({
+            sourceIndex: nodeIndex.get(e.source) ?? 0,
+            targetIndex: nodeIndex.get(e.target) ?? 0,
+            weight: e.weight,
+            directed: e.directed,
+          })),
+        });
+        navigate(`/graph/${createdGraphId}`);
+        return;
+      }
+
+      await updateGraph({ id: graphId, name: graphName.trim(), description: graphDescription.trim() || null });
+
+      const originalNodeIds = new Set(originalNodesRef.current.map(n => n.id));
+      const originalEdgeIds = new Set(originalEdgesRef.current.map(e => e.id));
+      const originalNodesById = new Map(originalNodesRef.current.map(n => [n.id, n]));
+      const originalEdgesById = new Map(originalEdgesRef.current.map(e => [e.id, e]));
+
+      const currentNodeIds = new Set(nodes.map(n => n.id));
+      const currentEdgeIds = new Set(edges.map(e => e.id));
+
+      const nodesToDelete = originalNodesRef.current.filter(n => !currentNodeIds.has(n.id));
+      const edgesToDelete = originalEdgesRef.current.filter(e => !currentEdgeIds.has(e.id));
+
+      await Promise.all(edgesToDelete.map(e => deleteEdge(e.id)));
+      await Promise.all(nodesToDelete.map(n => deleteNode(n.id)));
+
+      const nodesToCreate = nodes.filter(n => !originalNodeIds.has(n.id));
+      const createdNodes = await Promise.all(
+        nodesToCreate.map(n =>
+          createNode({
+            label: n.label,
+            x: n.x,
+            y: n.y,
+            graph: { id: graphId },
+          }),
+        ),
+      );
+      const tempIdToRealId = new Map(nodesToCreate.map((n, index) => [n.id, createdNodes[index].id]));
+
+      const nodesToUpdate = nodes.filter(n => {
+        if (!originalNodeIds.has(n.id)) return false;
+        const original = originalNodesById.get(n.id);
+        return !!original && (original.label !== n.label || original.x !== n.x || original.y !== n.y);
       });
+      await Promise.all(
+        nodesToUpdate.map(n =>
+          updateNode({
+            id: n.id,
+            label: n.label,
+            x: n.x,
+            y: n.y,
+            graph: { id: graphId },
+          }),
+        ),
+      );
+
+      const resolveNodeId = (nodeId: number) => tempIdToRealId.get(nodeId) ?? nodeId;
+
+      const edgesToCreate = edges.filter(e => !originalEdgeIds.has(e.id));
+      await Promise.all(
+        edgesToCreate.map(e =>
+          createEdge({
+            weight: e.weight,
+            directed: e.directed,
+            graph: { id: graphId },
+            source: { id: resolveNodeId(e.source) },
+            target: { id: resolveNodeId(e.target) },
+          }),
+        ),
+      );
+
+      const edgesToUpdate = edges.filter(e => {
+        if (!originalEdgeIds.has(e.id)) return false;
+        const original = originalEdgesById.get(e.id);
+        return (
+          !!original &&
+          (original.source !== e.source || original.target !== e.target || original.weight !== e.weight || original.directed !== e.directed)
+        );
+      });
+      await Promise.all(
+        edgesToUpdate.map(e =>
+          updateEdge({
+            id: e.id,
+            weight: e.weight,
+            directed: e.directed,
+            graph: { id: graphId },
+            source: { id: resolveNodeId(e.source) },
+            target: { id: resolveNodeId(e.target) },
+          }),
+        ),
+      );
+
       navigate(`/graph/${graphId}`);
     } catch (err: any) {
-      setErrorMessage(err?.message ?? 'Failed to create graph.');
+      setErrorMessage(err?.message ?? (isEditMode ? 'Failed to save graph.' : 'Failed to create graph.'));
     } finally {
       setSaving(false);
     }
@@ -207,7 +349,7 @@ export const GraphBuilder = () => {
           <p className="graph-builder__subtitle">Click to add nodes, drag to reposition, and connect nodes to create edges.</p>
         </div>
         <div className="graph-builder__header-actions">
-          <Button color="secondary" tag={Link} to="/graph">
+          <Button color="secondary" tag={Link} to="/">
             <FontAwesomeIcon icon="arrow-left" /> Back to list
           </Button>
         </div>
@@ -322,7 +464,13 @@ export const GraphBuilder = () => {
             <CardBody>
               <FormGroup>
                 <Label for="graph-name">Name</Label>
-                <Input id="graph-name" value={graphName} onChange={event => setGraphName(event.target.value)} placeholder="My cool graph" />
+                <Input
+                  id="graph-name"
+                  value={graphName}
+                  onChange={event => setGraphName(event.target.value)}
+                  placeholder="My cool graph"
+                  disabled={isEditMode}
+                />
               </FormGroup>
               <FormGroup>
                 <Label for="graph-description">Description</Label>
@@ -355,8 +503,8 @@ export const GraphBuilder = () => {
                 </Label>
               </FormGroup>
               <div className="graph-builder__panel-actions">
-                <Button color="primary" onClick={handleSave} disabled={saving}>
-                  <FontAwesomeIcon icon="save" /> {saving ? 'Saving...' : 'Create Graph'}
+                <Button color="primary" onClick={handleSave} disabled={saving || loadingGraph}>
+                  <FontAwesomeIcon icon="save" /> {saving ? 'Saving...' : isEditMode ? 'Save Changes' : 'Create Graph'}
                 </Button>
                 <Button color="outline-secondary" onClick={handleReset} disabled={saving}>
                   Clear canvas
