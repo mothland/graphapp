@@ -6,6 +6,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+RUN find src/main/webapp -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.scss" -o -name "*.css" -o -name "*.html" \) -print0 | xargs -0 sed -i 's/\r$//'
 RUN npm run webapp:prod
 
 FROM maven:3.9.9-eclipse-temurin-17 AS build

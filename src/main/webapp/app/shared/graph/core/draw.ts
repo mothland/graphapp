@@ -12,8 +12,9 @@ export function drawGraph(root: d3.Selection<SVGGElement, unknown, null, undefin
     .data(graph.edges)
     .enter()
     .append('line')
-    .attr('stroke', '#999')
-    .attr('stroke-width', 1.5)
+    .attr('stroke', '#64748b')
+    .attr('stroke-width', 2)
+    .attr('marker-end', d => (d.directed ? 'url(#arrow)' : null))
     .attr('x1', d => nodeById.get(d.source)?.x ?? 0)
     .attr('y1', d => nodeById.get(d.source)?.y ?? 0)
     .attr('x2', d => nodeById.get(d.target)?.x ?? 0)
@@ -27,9 +28,9 @@ export function drawGraph(root: d3.Selection<SVGGElement, unknown, null, undefin
     .enter()
     .append('text')
     .text(d => d.weight)
-    .attr('font-size', 10)
+    .attr('font-size', 12)
     .attr('text-anchor', 'middle')
-    .attr('fill', '#333')
+    .attr('fill', '#1f2937')
     .attr('x', d => edgeMidpoint(nodeById, d.source, d.target).x)
     .attr('y', d => edgeMidpoint(nodeById, d.source, d.target).y);
 
@@ -42,17 +43,15 @@ export function drawGraph(root: d3.Selection<SVGGElement, unknown, null, undefin
     .append('g')
     .attr('transform', d => `translate(${d.x}, ${d.y})`);
 
-  nodes
-    .append('circle')
-    .attr('r', 16)
-    .attr('fill', d => d.color ?? '#4f46e5');
+  nodes.append('circle').attr('r', 16).attr('fill', '#4f46e5').attr('stroke', '#1e1b4b').attr('stroke-width', 2);
 
   nodes
     .append('text')
     .text(d => d.label)
     .attr('dy', 5)
     .attr('text-anchor', 'middle')
-    .attr('fill', 'white');
+    .attr('fill', 'white')
+    .attr('font-size', 12);
 
   return { nodes, edges, edgeLabels };
 }

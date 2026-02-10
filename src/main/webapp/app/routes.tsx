@@ -10,6 +10,9 @@ import PasswordResetInit from 'app/modules/account/password-reset/init/password-
 import PasswordResetFinish from 'app/modules/account/password-reset/finish/password-reset-finish';
 import Logout from 'app/modules/login/logout';
 import Home from 'app/modules/home/home';
+import GraphRenderTest from 'app/modules/test/graph-render-test';
+import GraphRenderTestStatic from 'app/modules/test/graph-render-test-static';
+import GraphVisualize from 'app/modules/visualize/graph-visualize';
 import EntitiesRoutes from 'app/entities/routes';
 import PrivateRoute from 'app/shared/auth/private-route';
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
@@ -55,6 +58,30 @@ const AppRoutes = () => {
           element={
             <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
               <Admin />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="test"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.USER]}>
+              <GraphRenderTest />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="test-static"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.USER]}>
+              <GraphRenderTestStatic />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="visualize/:id"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.USER]}>
+              <GraphVisualize />
             </PrivateRoute>
           }
         />
