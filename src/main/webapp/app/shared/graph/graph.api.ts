@@ -9,6 +9,11 @@ export async function createGraph(payload: { name: string; description?: string 
   return res.data as { id: number };
 }
 
+export async function deleteGraph(id: number) {
+  const res = await axios.delete(`/api/graphs/${id}`);
+  return res.data;
+}
+
 export async function updateGraph(payload: { id: number; name: string; description?: string | null }) {
   const res = await axios.put(`/api/graphs/${payload.id}`, payload);
   return res.data as { id: number };

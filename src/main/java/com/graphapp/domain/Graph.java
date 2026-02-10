@@ -34,15 +34,15 @@ public class Graph implements Serializable {
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "graph")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "graph", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties(value = { "graph" }, allowSetters = true)
     private Set<Node> nodes = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "graph")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "graph", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties(value = { "source", "target", "graph" }, allowSetters = true)
     private Set<Edge> edges = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "graph")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "graph", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties(value = { "graph" }, allowSetters = true)
     private Set<Comment> comments = new HashSet<>();
 

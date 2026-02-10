@@ -7,7 +7,7 @@ import { Alert, Button, Card, CardBody, CardHeader, Col, Input, Row, Spinner } f
 
 import { renderGraphStatic } from 'app/shared/graph';
 import { GraphData } from 'app/shared/graph/core/types';
-import { FullGraphDTO, getFullGraphById } from 'app/shared/graph/graph.api';
+import { FullGraphDTO, deleteGraph, getFullGraphById } from 'app/shared/graph/graph.api';
 
 type GraphDTO = {
   id: number;
@@ -113,7 +113,15 @@ const GraphPreview = ({ graphId }: { graphId: number }) => {
 /* ---------------------------------- */
 /* Graph grid                         */
 /* ---------------------------------- */
-const GraphRendererGrid = ({ graphs }: { graphs: GraphDTO[] }) => (
+const GraphRendererGrid = ({
+  graphs,
+  deletingId,
+  onDelete,
+}: {
+  graphs: GraphDTO[];
+  deletingId: number | null;
+  onDelete: (graph: GraphDTO) => void;
+}) => (
   <Row className="g-3">
     {graphs.map(g => (
       <Col key={g.id} md="6">
@@ -131,6 +139,9 @@ const GraphRendererGrid = ({ graphs }: { graphs: GraphDTO[] }) => (
                   Edit
                 </Button>
               </Link>
+              <Button size="sm" color="danger" onClick={() => onDelete(g)} disabled={deletingId === g.id}>
+                {deletingId === g.id ? 'Deleting...' : 'Delete'}
+              </Button>
             </div>
           </CardHeader>
           <CardBody>
@@ -162,6 +173,7 @@ export const Home = () => {
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(0);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     const loadGraphs = async () => {
@@ -189,6 +201,18 @@ export const Home = () => {
   }, [page, pageCount]);
 
   const visibleGraphs = filteredGraphs.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+
+  const handleDelete = async (graph: GraphDTO) => {
+    const confirmed = window.confirm(`Supprimer le graphe "${graph.name}" ?`);
+    if (!confirmed) return;
+    setDeletingId(graph.id);
+    try {
+      await deleteGraph(graph.id);
+      setGraphs(prev => prev.filter(g => g.id !== graph.id));
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <Row className="home-layout">
@@ -259,7 +283,7 @@ export const Home = () => {
             <CardBody>Aucun graphe trouvé.</CardBody>
           </Card>
         ) : (
-          <GraphRendererGrid graphs={visibleGraphs} />
+          <GraphRendererGrid graphs={visibleGraphs} deletingId={deletingId} onDelete={handleDelete} />
         )}
       </Col>
     </Row>
