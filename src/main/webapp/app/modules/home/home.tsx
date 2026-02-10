@@ -1,9 +1,13 @@
 import './home.scss';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
+import { Alert, Button, Card, CardBody, CardHeader, Col, Input, Row, Spinner } from 'reactstrap';
+
+import { renderGraphStatic } from 'app/shared/graph';
+import { GraphData } from 'app/shared/graph/core/types';
+import { FullGraphDTO, getFullGraphById } from 'app/shared/graph/graph.api';
 
 type GraphDTO = {
   id: number;
@@ -13,6 +17,72 @@ type GraphDTO = {
 };
 
 const PAGE_SIZE = 4;
+const PREVIEW_WIDTH = 360;
+const PREVIEW_HEIGHT = 220;
+
+const GraphPreview = ({ graphId }: { graphId: number }) => {
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [graphData, setGraphData] = useState<GraphData | null>(null);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadGraph = async () => {
+      try {
+        setLoading(true);
+        setErrorMessage(null);
+
+        const full = await getFullGraphById(graphId);
+        if (!isActive) return;
+
+        setGraphData(mapToGraphData(full));
+      } catch (err: any) {
+        if (!isActive) return;
+        setErrorMessage(err?.message ?? 'Failed to load graph.');
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    };
+
+    if (graphId) {
+      loadGraph();
+    }
+
+    return () => {
+      isActive = false;
+    };
+  }, [graphId]);
+
+  useEffect(() => {
+    if (!graphData || !svgRef.current) return;
+    renderGraphStatic(svgRef.current, graphData, PREVIEW_WIDTH, PREVIEW_HEIGHT);
+  }, [graphData]);
+
+  return (
+    <div className="graph-preview">
+      {loading && (
+        <div className="d-flex align-items-center gap-2">
+          <Spinner size="sm" /> Loading preview...
+        </div>
+      )}
+      {errorMessage && (
+        <Alert color="danger" className="mb-0">
+          {errorMessage}
+        </Alert>
+      )}
+      {!loading && !errorMessage && !graphData && (
+        <Alert color="warning" className="mb-0">
+          No graph data.
+        </Alert>
+      )}
+      {!loading && !errorMessage && graphData && <svg ref={svgRef} width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} />}
+    </div>
+  );
+};
 
 // Placeholder pour le composant GraphRenderer (fait par ton collègue)
 const GraphRendererGrid = ({ graphs }: { graphs: GraphDTO[] }) => (
@@ -36,7 +106,7 @@ const GraphRendererGrid = ({ graphs }: { graphs: GraphDTO[] }) => (
             </div>
           </CardHeader>
           <CardBody>
-            <div className="graph-preview-placeholder">[GraphRenderer graphId={g.id}]</div>
+            <GraphPreview graphId={g.id} />
             {g.description ? <div className="text-muted mt-2">{g.description}</div> : null}
           </CardBody>
         </Card>
@@ -155,5 +225,18 @@ export const Home = () => {
     </Row>
   );
 };
+
+function mapToGraphData(full: FullGraphDTO): GraphData {
+  return {
+    nodes: full.nodes.map(n => ({ id: n.id, label: n.label, x: n.x, y: n.y })),
+    edges: full.edges.map(e => ({
+      id: e.id,
+      source: e.source,
+      target: e.target,
+      weight: e.weight,
+      directed: e.directed,
+    })),
+  };
+}
 
 export default Home;
