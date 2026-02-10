@@ -117,7 +117,7 @@ export const Home = () => {
       <Col md="9">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h1 className="h3 mb-0">Discover graphs</h1>
-          <Link to="/editor">
+          <Link to="/graph/builder">
             <Button color="primary">Create</Button>
           </Link>
         </div>
