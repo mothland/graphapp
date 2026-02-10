@@ -1,17 +1,15 @@
 // Override Bootstrap variables
 @import 'bootstrap-variables';
-@import 'bootswatch/dist/cerulean/variables';
+
 // Import Bootstrap source files from node_modules
 @import 'bootstrap/scss/bootstrap';
-@import 'bootswatch/dist/cerulean/bootswatch';
-body {
-  margin: 0;
-}
 
-a {
-  color: #533f03;
-  font-weight: bold;
-}
+// Graphapp theme tokens
+@import './theme';
+
+/* ==========================================================================
+Base / reset
+========================================================================== */
 
 * {
   -moz-box-sizing: border-box;
@@ -25,15 +23,18 @@ a {
 
 .app-container {
   box-sizing: border-box;
+
   .view-container {
     width: 100%;
     height: calc(100% - 40px);
     overflow-y: auto;
     overflow-x: hidden;
     padding: 1rem;
+
     .card {
       padding: 1rem;
     }
+
     .view-routes {
       height: 100%;
       > div {
@@ -226,6 +227,7 @@ Generic styles
 .no-margin {
   margin: 0;
 }
+
 @mixin voffset($size) {
   @if $size== '' {
     .voffset {
@@ -311,6 +313,211 @@ http://stackoverflow.com/questions/23436430/bootstrap-3-input-group-100-width */
 
 .width-min {
   width: 1% !important;
+}
+
+/* =========================================================
+Graphapp Global UI (NOTRE DESIGN SYSTEM)
+========================================================= */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--g-bg);
+  color: var(--g-text);
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* Container principal */
+.g-page {
+  max-width: var(--g-max-width);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.g-panel {
+  background: var(--g-surface);
+  border: 1px solid var(--g-border);
+  border-radius: var(--g-r-md);
+  box-shadow: var(--g-shadow);
+}
+
+.g-panel--muted {
+  background: var(--g-panel);
+}
+
+/* Typo */
+h1,
+.h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h2,
+.h2 {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.g-muted,
+.text-muted {
+  color: var(--g-muted) !important;
+}
+
+/* Links */
+a {
+  color: var(--g-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Navbar / header Graphapp ===== */
+
+.navbar {
+  background: var(--g-surface) !important;
+  border-bottom: 1px solid var(--g-border) !important;
+  box-shadow: none !important;
+}
+
+/* Important: corrige le "texte blanc sur fond blanc" */
+.navbar .nav-link,
+.navbar .navbar-text,
+.navbar .dropdown-toggle {
+  color: var(--g-text) !important;
+}
+
+.navbar .nav-link:hover,
+.navbar .dropdown-toggle:hover {
+  color: var(--g-primary) !important;
+}
+
+/* Cards Bootstrap -> panels Graphapp */
+.card {
+  background: var(--g-surface) !important;
+  border: 1px solid var(--g-border) !important;
+  border-radius: var(--g-r-md) !important;
+  box-shadow: none !important;
+}
+
+.card-header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--g-border) !important;
+}
+
+/* Forms */
+.form-control,
+.form-select {
+  background: #fff !important;
+  border: 1px solid var(--g-border) !important;
+  border-radius: var(--g-r-sm) !important;
+  box-shadow: none !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--g-primary) !important;
+  box-shadow: 0 0 0 4px var(--g-focus) !important;
+}
+
+/* ===== Buttons Graphapp (anti-bootstrap look) ===== */
+
+.btn {
+  border-radius: var(--g-r-sm) !important;
+  font-weight: 600;
+  padding: 0.45rem 0.8rem;
+  border-width: 1px !important;
+  box-shadow: none !important;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    transform 120ms ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* Primary */
+.btn-primary,
+.btn-primary:focus,
+.btn-primary:hover {
+  background: var(--g-primary) !important;
+  border-color: var(--g-primary) !important;
+  color: #fff !important;
+}
+
+/* Secondary: ghost */
+.btn-secondary,
+.btn-secondary:focus,
+.btn-secondary:hover {
+  background: transparent !important;
+  border-color: var(--g-border) !important;
+  color: var(--g-text) !important;
+}
+
+/* Success => warm accent */
+.btn-success,
+.btn-success:focus,
+.btn-success:hover {
+  background: var(--g-warn) !important;
+  border-color: var(--g-warn) !important;
+  color: #1f2933 !important;
+}
+
+/* Outline primary */
+.btn-outline-primary {
+  border-color: var(--g-primary) !important;
+  color: var(--g-primary) !important;
+  background: transparent !important;
+}
+
+.btn-outline-primary:hover {
+  background: rgba(59, 130, 246, 0.08) !important;
+}
+
+/* Tables */
+.table {
+  color: var(--g-text);
+}
+
+.table thead th {
+  border-bottom: 1px solid var(--g-border);
+}
+
+.table td,
+.table th {
+  border-top: 1px solid var(--g-border);
+}
+
+/* Utility */
+.g-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.g-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 /* jhipster-needle-scss-add-main JHipster will add new css style */

@@ -1,0 +1,30 @@
+:root {
+  /* Surfaces */
+  --g-bg: #f7f7f2; /* fond “papier” */
+  --g-surface: #fcfcf9; /* surface principale */
+  --g-panel: #f1f1ec; /* panneaux / sidebar */
+  --g-border: #dadad2;
+
+  /* Texte */
+  --g-text: #1f2933;
+  --g-muted: #6b7280;
+
+  /* Accents */
+  --g-primary: #3b82f6; /* bleu doux */
+  --g-warn: #f59e0b; /* orange doux */
+  --g-danger: #ef4444;
+  --g-ok: #10b981;
+
+  /* Form / focus */
+  --g-focus: rgba(59, 130, 246, 0.25);
+
+  /* Radius / spacing */
+  --g-r-md: 10px;
+  --g-r-sm: 8px;
+
+  /* Shadows (très soft) */
+  --g-shadow: 0 1px 0 rgba(0, 0, 0, 0.04), 0 8px 20px rgba(0, 0, 0, 0.06);
+
+  /* Layout */
+  --g-max-width: 1200px;
+}
