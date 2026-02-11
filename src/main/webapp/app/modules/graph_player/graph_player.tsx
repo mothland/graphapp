@@ -267,7 +267,7 @@ const GraphPlayerPage = () => {
       .selectAll<SVGCircleElement, GraphNode>('circle')
       .attr('fill', node => {
         if (node.id === currentNodeId) return '#f59e0b';
-        if (node.id === selection.start) return '#2563eb';
+        if (node.id === selection.start) return '#d4eb25';
         if (node.id === selection.end) return '#dc2626';
         if (visitedNodeIds.has(node.id)) return '#10b981';
         return '#4f46e5';
