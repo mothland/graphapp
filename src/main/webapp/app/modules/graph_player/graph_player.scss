@@ -1,0 +1,259 @@
+.graph-player-page {
+  padding: 1.5rem;
+}
+
+.graph-player-loading {
+  min-height: 55vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  color: #334155;
+}
+
+.graph-player-shell {
+  border: 0;
+  box-shadow: 0 20px 45px -35px rgba(2, 6, 23, 0.95);
+}
+
+.graph-player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  background: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 100%);
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.graph-player-title {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #0f172a;
+}
+
+.graph-player-subtitle {
+  margin: 0.4rem 0 0;
+  color: #475569;
+}
+
+.graph-player-meta {
+  min-width: 220px;
+  text-align: right;
+}
+
+.meta-label {
+  color: #64748b;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.meta-value {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.meta-description {
+  margin-top: 0.35rem;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.graph-player-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.graph-player-canvas {
+  background-color: #f8fafc;
+  border: 1px solid #dbe4ee;
+  border-radius: 12px;
+  padding: 0.85rem;
+}
+
+.graph-player-svg {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  aspect-ratio: 1080 / 620;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background-color: #ffffff;
+}
+
+.graph-player-legend {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #334155;
+  font-size: 0.84rem;
+}
+
+.legend-dot {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 100%;
+}
+
+.legend-start {
+  background-color: #2563eb;
+}
+
+.legend-end {
+  background-color: #dc2626;
+}
+
+.legend-current {
+  background-color: #f59e0b;
+}
+
+.legend-visited {
+  background-color: #10b981;
+}
+
+.legend-line {
+  display: inline-block;
+  width: 1rem;
+  height: 0;
+  border-top: 3px solid transparent;
+}
+
+.legend-path {
+  border-color: #16a34a;
+}
+
+.graph-player-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.panel-block {
+  border: 1px solid #dbe4ee;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 0.9rem;
+}
+
+.panel-title {
+  margin: 0 0 0.65rem;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.panel-block p {
+  margin-bottom: 0.45rem;
+  color: #1e293b;
+}
+
+.panel-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #334155;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.graph-player-select {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.92rem;
+}
+
+.graph-player-select:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
+.graph-player-actions {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.graph-player-actions .btn {
+  width: 100%;
+}
+
+.progress-track {
+  width: 100%;
+  height: 0.62rem;
+  border-radius: 999px;
+  background: #dbe4ee;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+  transition: width 220ms ease;
+}
+
+.progress-value {
+  margin-top: 0.45rem;
+  color: #334155;
+  font-size: 0.88rem;
+}
+
+.result-row {
+  margin-top: 0.75rem;
+}
+
+.result-label {
+  color: #64748b;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.result-value {
+  margin-top: 0.2rem;
+  color: #0f172a;
+  word-break: break-word;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 1200px) {
+  .graph-player-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .graph-player-meta {
+    text-align: left;
+    min-width: 0;
+  }
+
+  .graph-player-svg {
+    min-height: 520px;
+  }
+}
+
+@media (max-width: 768px) {
+  .graph-player-page {
+    padding: 0.8rem;
+  }
+
+  .graph-player-header {
+    flex-direction: column;
+  }
+
+  .graph-player-title {
+    font-size: 1.25rem;
+  }
+
+  .graph-player-svg {
+    min-height: 420px;
+  }
+}

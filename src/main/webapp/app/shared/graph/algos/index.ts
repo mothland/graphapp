@@ -1,7 +1,9 @@
 import { GraphAlgo } from './types';
 import bfsAlgo from './bfs';
+import dfsAlgo from './dfs';
+import dijkstraAlgo from './dijkstra';
 
-const fallbackAlgos: GraphAlgo[] = [bfsAlgo];
+const fallbackAlgos: GraphAlgo[] = [bfsAlgo, dfsAlgo, dijkstraAlgo];
 
 const context = (require as any)?.context?.('./', false, /\.ts$/);
 
