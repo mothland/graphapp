@@ -225,6 +225,64 @@
   font-size: 0.92rem;
 }
 
+.graph-player-comment-input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0.6rem 0.7rem;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.graph-player-comment-input:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
+.graph-player-comment-btn {
+  width: 100%;
+  margin-top: 0.55rem;
+}
+
+.graph-player-comments-loading,
+.graph-player-comments-empty {
+  margin-top: 0.75rem;
+  color: #64748b;
+  font-size: 0.87rem;
+}
+
+.graph-player-comments-list {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 0.1rem;
+}
+
+.graph-player-comment-item {
+  border: 1px solid #dbe4ee;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 0.55rem 0.65rem;
+}
+
+.graph-player-comment-content {
+  color: #0f172a;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.graph-player-comment-meta {
+  margin-top: 0.35rem;
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
 @media (max-width: 1200px) {
   .graph-player-layout {
     grid-template-columns: 1fr;

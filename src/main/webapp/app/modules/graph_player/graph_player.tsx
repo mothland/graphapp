@@ -28,6 +28,12 @@ type GraphOption = {
   description?: string | null;
 };
 
+type CommentItem = {
+  id: number;
+  content: string;
+  createdAt?: string | null;
+};
+
 type RenderedEdge = Omit<GraphEdge, 'source' | 'target'> & {
   source: number | GraphNode;
   target: number | GraphNode;
@@ -60,6 +66,11 @@ const GraphPlayerPage = () => {
   const [algoResult, setAlgoResult] = useState<AlgoResult | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [comments, setComments] = useState<CommentItem[]>([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [commentDraft, setCommentDraft] = useState('');
+  const [commentError, setCommentError] = useState<string | null>(null);
 
   const loading = loadingCatalog || loadingGraph;
   const activeAlgo = getGraphAlgoById(selectedAlgoId) ?? graphAlgos[0];
@@ -199,6 +210,41 @@ const GraphPlayerPage = () => {
       isActive = false;
     };
   }, [selectedGraphId, graphOptions, resetRunState]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadComments = async () => {
+      if (selectedGraphId === null) {
+        setComments([]);
+        setCommentDraft('');
+        setCommentError(null);
+        return;
+      }
+
+      try {
+        setLoadingComments(true);
+        setCommentError(null);
+        const res = await axios.get<CommentItem[]>(`/api/comments?graphId=${selectedGraphId}`);
+        if (!isActive) return;
+        setComments(res.data ?? []);
+      } catch (err: any) {
+        if (!isActive) return;
+        setCommentError(err?.message ?? 'Unable to load comments.');
+        setComments([]);
+      } finally {
+        if (isActive) {
+          setLoadingComments(false);
+        }
+      }
+    };
+
+    loadComments();
+
+    return () => {
+      isActive = false;
+    };
+  }, [selectedGraphId]);
 
   useEffect(() => {
     if (!svgRef.current || !graphData) return;
@@ -368,6 +414,35 @@ const GraphPlayerPage = () => {
     setInfoMessage(null);
   };
 
+  const handleCreateComment = async () => {
+    if (selectedGraphId === null) return;
+
+    const content = commentDraft.trim();
+    if (!content) {
+      setCommentError('Write a comment before submitting.');
+      return;
+    }
+
+    try {
+      setSubmittingComment(true);
+      setCommentError(null);
+
+      await axios.post('/api/comments', {
+        content,
+        createdAt: new Date().toISOString(),
+        graph: { id: selectedGraphId },
+      });
+
+      const refreshed = await axios.get<CommentItem[]>(`/api/comments?graphId=${selectedGraphId}`);
+      setComments(refreshed.data ?? []);
+      setCommentDraft('');
+    } catch (err: any) {
+      setCommentError(err?.message ?? 'Unable to submit comment.');
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="graph-player-loading">
@@ -526,6 +601,50 @@ const GraphPlayerPage = () => {
                     </div>
                   </div>
                 )}
+
+                <div className="panel-block">
+                  <h2 className="panel-title">Comments</h2>
+                  <textarea
+                    className="graph-player-comment-input"
+                    value={commentDraft}
+                    onChange={event => setCommentDraft(event.target.value)}
+                    placeholder="Add a comment about this graph..."
+                    rows={3}
+                    maxLength={2000}
+                    disabled={selectedGraphId === null || submittingComment}
+                  />
+                  <Button
+                    color="dark"
+                    className="graph-player-comment-btn"
+                    onClick={handleCreateComment}
+                    disabled={selectedGraphId === null || submittingComment}
+                  >
+                    {submittingComment ? 'Posting...' : 'Post comment'}
+                  </Button>
+
+                  {commentError && (
+                    <Alert color="warning" className="mt-2 mb-0">
+                      {commentError}
+                    </Alert>
+                  )}
+
+                  {loadingComments ? (
+                    <div className="graph-player-comments-loading">Loading comments...</div>
+                  ) : (
+                    <div className="graph-player-comments-list">
+                      {comments.length === 0 ? (
+                        <div className="graph-player-comments-empty">No comments yet.</div>
+                      ) : (
+                        comments.map(comment => (
+                          <article key={comment.id} className="graph-player-comment-item">
+                            <div className="graph-player-comment-content">{comment.content}</div>
+                            <div className="graph-player-comment-meta">{formatCommentDate(comment.createdAt)}</div>
+                          </article>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
               </aside>
             </div>
           )}
@@ -581,6 +700,13 @@ function isEdgeInPath(edge: RenderedEdge, pathEdgeSet: Set<string>): boolean {
   }
 
   return !edge.directed && pathEdgeSet.has(edgeKey(target, source));
+}
+
+function formatCommentDate(value?: string | null): string {
+  if (!value) return 'Unknown date';
+  const timestamp = Date.parse(value);
+  if (Number.isNaN(timestamp)) return value;
+  return new Date(timestamp).toLocaleString();
 }
 
 export default GraphPlayerPage;

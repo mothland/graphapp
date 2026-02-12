@@ -5,7 +5,6 @@ compose_files=(
   "src/main/docker/app.yml"
   "src/main/docker/services.yml"
   "src/main/docker/monitoring.yml"
-  "src/main/docker/jhipster-control-center.yml"
 )
 
 for file in "${compose_files[@]}"; do

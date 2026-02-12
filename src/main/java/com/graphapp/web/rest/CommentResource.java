@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -52,6 +53,9 @@ public class CommentResource {
         LOG.debug("REST request to save Comment : {}", comment);
         if (comment.getId() != null) {
             throw new BadRequestAlertException("A new comment cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+        if (comment.getCreatedAt() == null) {
+            comment.setCreatedAt(Instant.now());
         }
         comment = commentRepository.save(comment);
         return ResponseEntity.created(new URI("/api/comments/" + comment.getId()))
@@ -146,8 +150,11 @@ public class CommentResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of comments in body.
      */
     @GetMapping("")
-    public List<Comment> getAllComments() {
-        LOG.debug("REST request to get all Comments");
+    public List<Comment> getAllComments(@RequestParam(value = "graphId", required = false) Long graphId) {
+        LOG.debug("REST request to get all Comments for graphId={}", graphId);
+        if (graphId != null) {
+            return commentRepository.findAllByGraphIdOrderByCreatedAtDescIdDesc(graphId);
+        }
         return commentRepository.findAll();
     }
 

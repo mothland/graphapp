@@ -4,8 +4,7 @@ $ErrorActionPreference = "Stop"
 $composeFiles = @(
   "src/main/docker/app.yml",
   "src/main/docker/services.yml",
-  "src/main/docker/monitoring.yml",
-  "src/main/docker/jhipster-control-center.yml"
+  "src/main/docker/monitoring.yml"
 )
 
 foreach ($file in $composeFiles) {
