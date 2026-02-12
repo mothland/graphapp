@@ -2,10 +2,11 @@ import { GraphAlgo } from './types';
 import bfsAlgo from './bfs';
 import dfsAlgo from './dfs';
 import dijkstraAlgo from './dijkstra';
+import bellmanFordAlgo from './bellman-ford';
 import primAlgo from './prim';
 import kruskalAlgo from './kruskal';
 
-const fallbackAlgos: GraphAlgo[] = [bfsAlgo, dfsAlgo, dijkstraAlgo, primAlgo, kruskalAlgo];
+const fallbackAlgos: GraphAlgo[] = [bfsAlgo, dfsAlgo, dijkstraAlgo, bellmanFordAlgo, primAlgo, kruskalAlgo];
 
 const context = (require as any)?.context?.('./', false, /\.ts$/);
 

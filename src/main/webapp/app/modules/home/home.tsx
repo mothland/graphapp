@@ -163,6 +163,7 @@ const ALGORITHMS = [
   { name: 'Dijkstra', url: 'https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm' },
   { name: 'Kruskal', url: 'https://en.wikipedia.org/wiki/Kruskal%27s_algorithm' },
   { name: 'Prim', url: 'https://en.wikipedia.org/wiki/Prim%27s_algorithm' },
+  { name: 'Bellman-Ford', url: 'https://en.wikipedia.org/wiki/Bellman%E2%80%93Ford_algorithm' },
 ];
 
 /* ---------------------------------- */
