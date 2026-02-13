@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Alert, Badge, Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Label, Row } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -41,6 +41,9 @@ export const GraphBuilder = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const originalNodesRef = useRef<BuilderNode[]>([]);
   const originalEdgesRef = useRef<BuilderEdge[]>([]);
+  const nextTempNodeIdRef = useRef(-1);
+  const nextTempEdgeIdRef = useRef(-1);
+  const nextNodeLabelRef = useRef(1);
 
   const [graphName, setGraphName] = useState('');
   const [graphDescription, setGraphDescription] = useState('');
@@ -58,9 +61,6 @@ export const GraphBuilder = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [loadingGraph, setLoadingGraph] = useState(false);
-
-  const nextNodeId = useMemo(() => (nodes.length === 0 ? 1 : Math.max(...nodes.map(n => n.id)) + 1), [nodes]);
-  const nextEdgeId = useMemo(() => (edges.length === 0 ? 1 : Math.max(...edges.map(e => e.id)) + 1), [edges]);
 
   useEffect(() => {
     const updateSize = () => {
@@ -94,6 +94,9 @@ export const GraphBuilder = () => {
         }));
         originalNodesRef.current = loadedNodes;
         originalEdgesRef.current = loadedEdges;
+        nextTempNodeIdRef.current = -1;
+        nextTempEdgeIdRef.current = -1;
+        nextNodeLabelRef.current = loadedNodes.length + 1;
         setNodes(loadedNodes);
         setEdges(loadedEdges);
         setSelectedNodeId(null);
@@ -129,9 +132,12 @@ export const GraphBuilder = () => {
   };
 
   const addNodeAt = (x: number, y: number) => {
-    const label = `N${nextNodeId}`;
-    setNodes(prev => [...prev, { id: nextNodeId, label, x, y }]);
-    setSelectedNodeId(nextNodeId);
+    const tempNodeId = nextTempNodeIdRef.current;
+    nextTempNodeIdRef.current -= 1;
+    const label = `N${nextNodeLabelRef.current}`;
+    nextNodeLabelRef.current += 1;
+    setNodes(prev => [...prev, { id: tempNodeId, label, x, y }]);
+    setSelectedNodeId(tempNodeId);
   };
 
   const addEdge = (sourceId: number, targetId: number) => {
@@ -145,7 +151,7 @@ export const GraphBuilder = () => {
     setEdges(prev => [
       ...prev,
       {
-        id: nextEdgeId,
+        id: nextTempEdgeIdRef.current--,
         source: sourceId,
         target: targetId,
         weight: edgeWeight,
@@ -289,7 +295,13 @@ export const GraphBuilder = () => {
         ),
       );
 
-      const resolveNodeId = (nodeId: number) => tempIdToRealId.get(nodeId) ?? nodeId;
+      const resolveNodeId = (nodeId: number): number => {
+        const resolvedNodeId = tempIdToRealId.get(nodeId) ?? nodeId;
+        if (resolvedNodeId <= 0) {
+          throw new Error(`Unable to resolve temporary node id ${nodeId} before edge persistence.`);
+        }
+        return resolvedNodeId;
+      };
 
       const edgesToCreate = edges.filter(e => !originalEdgeIds.has(e.id));
       await Promise.all(
@@ -336,6 +348,9 @@ export const GraphBuilder = () => {
   const handleReset = () => {
     setNodes([]);
     setEdges([]);
+    nextTempNodeIdRef.current = -1;
+    nextTempEdgeIdRef.current = -1;
+    nextNodeLabelRef.current = 1;
     setSelectedNodeId(null);
     setConnectFromId(null);
     setConnectMode(false);
@@ -549,7 +564,7 @@ export const GraphBuilder = () => {
                     <div key={edge.id} className="graph-builder__edge-row">
                       <div className="graph-builder__edge-label">
                         {nodes.find(n => n.id === edge.source)?.label ?? edge.source}
-                        {' -> '}
+                        {edge.directed ? ' -> ' : ' <-> '}
                         {nodes.find(n => n.id === edge.target)?.label ?? edge.target}
                       </div>
                       <div className="graph-builder__edge-controls">

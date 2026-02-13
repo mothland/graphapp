@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { GraphData, GraphNode } from '../core/types';
-import { drawGraph } from '../core/draw';
+import { drawGraph, getEdgeGeometry } from '../core/draw';
 
 export interface GraphInteractionHandlers {
   onNodeSelect?: (node: GraphNode | null) => void;
@@ -67,14 +67,14 @@ export function renderGraphDynamic(
     nodes.attr('transform', d => `translate(${d.x}, ${d.y})`);
 
     edges
-      .attr('x1', d => (d.source as GraphNode).x)
-      .attr('y1', d => (d.source as GraphNode).y)
-      .attr('x2', d => (d.target as GraphNode).x)
-      .attr('y2', d => (d.target as GraphNode).y);
+      .attr('x1', d => getEdgeGeometry(d.source as GraphNode, d.target as GraphNode, d.directed).x1)
+      .attr('y1', d => getEdgeGeometry(d.source as GraphNode, d.target as GraphNode, d.directed).y1)
+      .attr('x2', d => getEdgeGeometry(d.source as GraphNode, d.target as GraphNode, d.directed).x2)
+      .attr('y2', d => getEdgeGeometry(d.source as GraphNode, d.target as GraphNode, d.directed).y2);
 
     edgeLabels
-      .attr('x', d => ((d.source as GraphNode).x + (d.target as GraphNode).x) / 2)
-      .attr('y', d => ((d.source as GraphNode).y + (d.target as GraphNode).y) / 2);
+      .attr('x', d => getEdgeGeometry(d.source as GraphNode, d.target as GraphNode, d.directed).mx)
+      .attr('y', d => getEdgeGeometry(d.source as GraphNode, d.target as GraphNode, d.directed).my);
   }
 
   // ----------------------------

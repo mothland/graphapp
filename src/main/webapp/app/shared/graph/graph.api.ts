@@ -15,7 +15,9 @@ export async function deleteGraph(id: number) {
 }
 
 export async function updateGraph(payload: { id: number; name: string; description?: string | null }) {
-  const res = await axios.put(`/api/graphs/${payload.id}`, payload);
+  const res = await axios.patch(`/api/graphs/${payload.id}`, payload, {
+    headers: { 'Content-Type': 'application/merge-patch+json' },
+  });
   return res.data as { id: number };
 }
 
