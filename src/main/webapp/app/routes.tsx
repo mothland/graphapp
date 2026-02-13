@@ -10,6 +10,7 @@ import PasswordResetInit from 'app/modules/account/password-reset/init/password-
 import PasswordResetFinish from 'app/modules/account/password-reset/finish/password-reset-finish';
 import Logout from 'app/modules/login/logout';
 import Home from 'app/modules/home/home';
+import GraphInsights from 'app/modules/requirements/graph-insights';
 import GraphRenderTest from 'app/modules/test/graph-render-test';
 import GraphRenderTestStatic from 'app/modules/test/graph-render-test-static';
 import EntitiesRoutes from 'app/entities/routes';
@@ -57,6 +58,14 @@ const AppRoutes = () => {
           element={
             <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
               <Admin />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="graph-insights"
+          element={
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.USER]}>
+              <GraphInsights />
             </PrivateRoute>
           }
         />

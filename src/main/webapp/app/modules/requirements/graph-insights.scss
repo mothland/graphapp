@@ -1,0 +1,21 @@
+.graph-insights-page {
+  .graph-insights-page__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+  }
+
+  .graph-insights-page__grid {
+    width: 100%;
+    height: 460px;
+  }
+
+  .graph-insights-page__loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+  }
+}

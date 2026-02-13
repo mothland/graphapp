@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -54,6 +55,9 @@ public class GraphResource {
         LOG.debug("REST request to save Graph : {}", graph);
         if (graph.getId() != null) {
             throw new BadRequestAlertException("A new graph cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+        if (graph.getCreatedAt() == null) {
+            graph.setCreatedAt(Instant.now());
         }
         graph = graphRepository.save(graph);
         return ResponseEntity.created(new URI("/api/graphs/" + graph.getId()))

@@ -41,7 +41,7 @@ export const GraphDetail = () => {
           </dt>
           <dd>{graphEntity.createdAt ? <TextFormat value={graphEntity.createdAt} type="date" format={APP_DATE_FORMAT} /> : null}</dd>
         </dl>
-        <Button tag={Link} to="/graph" replace color="info" data-cy="entityDetailsBackButton">
+        <Button tag={Link} to="/" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>
         </Button>
         &nbsp;

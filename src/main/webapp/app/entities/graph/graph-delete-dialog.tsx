@@ -23,7 +23,7 @@ export const GraphDeleteDialog = () => {
   const updateSuccess = useAppSelector(state => state.graph.updateSuccess);
 
   const handleClose = () => {
-    navigate('/graph');
+    navigate('/');
   };
 
   useEffect(() => {

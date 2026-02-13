@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route } from 'react-router';
+import { Navigate } from 'react-router-dom';
 
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
@@ -11,7 +12,7 @@ import GraphDeleteDialog from './graph-delete-dialog';
 
 const GraphRoutes = () => (
   <ErrorBoundaryRoutes>
-    <Route index element={<Graph />} />
+    <Route index element={<Navigate to="/" replace />} />
     <Route path="builder" element={<GraphBuilder />} />
     <Route path="builder/:id" element={<GraphBuilder />} />
     <Route path="new" element={<GraphUpdate />} />

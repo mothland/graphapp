@@ -252,9 +252,14 @@ export const Home = () => {
       <Col md="9">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h1 className="h3 mb-0">Discover graphs</h1>
-          <Link to="/graph/builder">
-            <Button color="primary">Create</Button>
-          </Link>
+          <div className="d-flex gap-2">
+            <Link to="/graph-insights">
+              <Button color="info">Insights</Button>
+            </Link>
+            <Link to="/graph/builder">
+              <Button color="primary">Create</Button>
+            </Link>
+          </div>
         </div>
 
         <div className="d-flex gap-2 align-items-center mb-3">
